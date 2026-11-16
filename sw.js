@@ -1,0 +1,4 @@
+const CACHE='cac-outlet-income-v1';const FILES=['./','./index.html','./sw.js'];
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(FILES);await self.skipWaiting();})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('cac-outlet-income-')&&k!==CACHE)await caches.delete(k);await self.clients.claim();})()));
+self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin||!u.pathname.startsWith(new URL(self.registration.scope).pathname))return;e.respondWith((async()=>{try{const r=await fetch(e.request);if(r.ok){const c=await caches.open(CACHE);c.put(e.request,r.clone());}return r;}catch(err){const c=await caches.open(CACHE),r=await c.match(e.request);if(r)return r;if(e.request.mode==='navigate')return c.match('./');throw err;}})());});
